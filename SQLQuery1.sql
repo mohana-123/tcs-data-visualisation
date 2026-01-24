@@ -1,0 +1,12 @@
+--create view online_retail as
+--select
+--	InvoiceNo,
+--	InvoiceDate,
+--	CustomerID,
+--	Country,
+--	StockCode,
+--	Quantity,
+--	UnitPrice,
+--	Quantity * UnitPrice as Revenue
+--from [Online Retail]
+--where Quantity > 0 and UnitPrice > 0;  -- 5,41,909 - 5,30,104 = 11,805 rows gone and filtered
