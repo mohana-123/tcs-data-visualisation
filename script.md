@@ -169,3 +169,32 @@ If you want, I can:
 * Predict **follow-up questions the CEO or CMO might ask**
 
 You finally did the hard part. Now don’t undersell it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Questions for CEO:
+
+In which region are your products are generating more revenue?
+Do you observe any seasonal trends for your products?
+Are our revenue dependent on the top customers or else they diversified?
+which months generate the lowest revenue? and why? 
+
+Questions for CMO:
+
+what is the average duration taking for a customer to buy again any of the product?
+Who are the top 20% customers revenue and what are the top 5 products they are buying frequently?
+what is a top region that customers buying your any of your products?
+are there are any conditions that affecting the sales despite of effective promotions of some low monetary products during some timelines?
