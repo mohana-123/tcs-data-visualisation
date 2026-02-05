@@ -1,26 +1,48 @@
--- DROP VIEW IF EXISTS dbo.online_retail;
+-- DROP VIEW IF EXISTS dbo.online_retail_null;
+-- DROP VIEW IF EXISTS dbo.online_retail_withoutnull;
 
--- create view online_retail as
+-- create view online_retail_null as
 -- select
 -- 	InvoiceNo,
 -- 	InvoiceDate,
 -- 	CustomerID,
 -- 	Country,
 -- 	StockCode,
+--     Description,
 -- 	Quantity,
 -- 	UnitPrice,
 -- 	Quantity * UnitPrice as Revenue
--- from [Online Retail]
--- where Quantity > 0 and UnitPrice > 0        -- 5,41,909 - 5,30,104 = 11,805 rows gone and filtered
+-- from Online_Retail
+-- where Quantity > 0 AND UnitPrice > 0        -- 5,41,909 - 5,30,104 = 11,805 rows gone and filtered
 --       AND InvoiceDate NOT BETWEEN '2010-12-01' AND '2010-12-31';        -- 488624
 
+
+-- create view online_retail_withoutnull as
+-- select
+-- 	InvoiceNo,
+-- 	InvoiceDate,
+-- 	CustomerID,
+-- 	Country,
+-- 	StockCode,
+--  Description,
+-- 	Quantity,
+-- 	UnitPrice,
+-- 	Quantity * UnitPrice as Revenue
+-- from Online_Retail
+-- where Quantity > 0 AND UnitPrice > 0        -- 5,41,909 - 5,30,104 = 11,805 rows gone and filtered
+--       AND InvoiceDate NOT BETWEEN '2010-12-01' AND '2010-12-31'        -- 488624
+--       AND CustomerID IS NOT NULL     --3,71,727 rows
+
+-- SELECT
+--     *
+-- FROM online_retail_withoutnull
 
 -- Q1. In which region are your products are generating more revenue? =========================================================================
 
 -- SELECT
 --     Country,
 --     ROUND(SUM(Revenue) , 2) AS Total_revenue
--- FROM online_retail
+-- FROM online_retail_cleaned
 -- GROUP BY Country
 -- ORDER BY Total_revenue DESC
 
@@ -30,21 +52,21 @@
 
 
 -- Q2. Are there seasonal trends? ==========================================================================================================
-SELECT
-    month_name,
-    Total_revenue,
-    CASE WHEN Total_revenue <= AVG(Total_revenue) OVER() THEN 'organic growth'
-         ELSE 'Holiday spikes'
-    END AS flag_revenue
-FROM
-(
-SELECT
-    DATENAME(MONTH, InvoiceDate) as month_name,
-    COUNT(CustomerID) Customer_count,
-    ROUND(SUM(Revenue) , 2) AS Total_revenue
-FROM online_retail
-GROUP BY DATENAME(MONTH, InvoiceDate)
-)t
+-- SELECT
+--     month_name,
+--     Total_revenue,
+--     CASE WHEN Total_revenue <= AVG(Total_revenue) OVER() THEN 'organic growth'
+--          ELSE 'Holiday spikes'
+--     END AS flag_revenue
+-- FROM
+-- (
+-- SELECT
+--     DATENAME(MONTH, InvoiceDate) as month_name,
+--     COUNT(CustomerID) Customer_count,
+--     ROUND(SUM(Revenue) , 2) AS Total_revenue
+-- FROM online_retail
+-- GROUP BY DATENAME(MONTH, InvoiceDate)
+-- )t
 
 
 -- Q3. Are we dependent on top customers? ==============================================================================================
