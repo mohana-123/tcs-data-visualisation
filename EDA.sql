@@ -84,19 +84,17 @@
 
 -- =================================================================================================================
 
+-- these has -ve values in quantity
 
 -- SELECT * FROM Online_Retail
 -- WHERE InvoiceNo LIKE 'A%' OR InvoiceNo LIKE 'C%' AND Quantity <= 0
 
+
 -- =================================================================================================================
-
-
 
 -- How many countries are present? => 38 countries
 
 -- SELECT
 --   distinct Country
 -- FROM Online_Retail
-
-
 
