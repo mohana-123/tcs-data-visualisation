@@ -55,6 +55,8 @@
 -- AND UnitPrice >= 0
 -- AND CustomerID IS NOT NULL
 
+-- i know that we can just query the retail_clean_with_nulls... sorry...
+
 -- 4847 rows with duplicates removed
 
 
