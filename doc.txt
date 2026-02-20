@@ -64,3 +64,20 @@ Questions for CMO:
 
 
 
+
+
+
+
+
+
+How You Present This to CMO
+
+Instead of saying:
+
+“Average repeat duration is 45 days.”
+
+Say:
+
+“On average, customers return within 45 days. However, 60% of repeat purchases occur within 30 days, indicating a strong short-term repurchase behavior. This suggests we should trigger remarketing campaigns around 25–30 days after purchase.”
+
+That is executive framing.

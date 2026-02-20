@@ -23,10 +23,10 @@
 -- 10624
 -- 11803
 
--- DROP TABLE retail_clean;
+-- DROP TABLE retail_clean_with_nulls;
 
 
--- with nulls in customer_id column
+-- -- with nulls in customer_id column
 -- SELECT 
 --     DISTINCT *, 
 --     Quantity*UnitPrice AS Revenue,
@@ -38,10 +38,11 @@
 -- AND InvoiceNo NOT LIKE 'A%'
 -- AND Quantity >= 0
 -- AND UnitPrice >= 0
+-- ORDER BY InvoiceDate
 
 
 
--- without nulls in customer_id column
+-- -- without nulls in customer_id column
 -- SELECT 
 --     DISTINCT *, 
 --     Quantity*UnitPrice AS Revenue,
@@ -54,13 +55,186 @@
 -- AND Quantity >= 0
 -- AND UnitPrice >= 0
 -- AND CustomerID IS NOT NULL
+-- ORDER BY InvoiceDate
 
--- i know that we can just query the retail_clean_with_nulls... sorry...
+-- -- i know that we can just query the retail_clean_with_nulls... sorry...
 
--- 4847 rows with duplicates removed
+-- -- 4847 rows with duplicates removed
 
 
 
 -- SELECT * FROM retail_clean_with_out_nulls  -- 3,92,732 rows without nulls in customer_id column
 
 -- SELECT * FROM retail_clean_with_nulls -- 5,26,051 rows with nulls in customer_id column
+
+
+
+-- ################################################################################################################################################################
+
+
+
+-- CREATE VIEW cleaned_sales AS
+-- SELECT *
+-- FROM retail_clean_with_out_nulls
+
+
+-- Q1
+-- Get each customer's purchase sequence
+-- Calculate difference in days
+
+
+-- SELECT
+--     CustomerID,
+--     InvoiceDate,
+--     LAG(InvoiceDate) OVER (PARTITION BY CustomerID ORDER BY InvoiceDate) AS Previous_Purchase_Date
+-- FROM cleaned_sales;
+
+
+-- with purchase_gap AS(
+-- SELECT
+--     CustomerID,
+--     InvoiceDate,
+--     LAG(InvoiceDate) OVER (PARTITION BY CustomerID ORDER BY InvoiceDate) AS Previous_Purchase_Date,
+--     DATEDIFF(DAY, LAG(InvoiceDate) OVER (PARTITION BY CustomerID ORDER BY InvoiceDate),InvoiceDate) AS Days_Between_Purchases
+-- FROM cleaned_sales
+-- )
+
+
+-- SELECT *
+-- FROM purchase_gap
+-- WHERE Days_Between_Purchases IS NOT NULL;
+
+-- SELECT 
+--     AVG(Days_Between_Purchases) AS Avg_Repeat_Duration_Days
+-- FROM purchase_gap
+-- WHERE Days_Between_Purchases IS NOT NULL;
+
+
+
+
+-- create a view
+
+
+-- CREATE VIEW vw_customer_repeat_gap AS
+-- WITH purchase_gap AS (
+--     SELECT
+--         CustomerID,
+--         InvoiceDate,
+--         DATEDIFF(DAY,
+--             LAG(InvoiceDate) OVER (
+--                 PARTITION BY CustomerID
+--                 ORDER BY InvoiceDate
+--             ),
+--             InvoiceDate
+--         ) AS Days_Between_Purchases
+--     FROM cleaned_sales
+-- )
+-- SELECT *
+-- FROM purchase_gap
+-- WHERE Days_Between_Purchases IS NOT NULL;
+
+
+
+
+-- Q2 =>  part-1 => Who are the top 20% customers revenue?
+
+
+-- SELECT * FROM
+-- (SELECT 
+--     CustomerID,
+--     SUM(Revenue) AS Total_Revenue,
+--     NTILE(5) OVER (ORDER BY SUM(Revenue) DESC) AS revenue_group
+-- FROM cleaned_sales
+-- GROUP BY CustomerID)t
+-- WHERE revenue_group = 1
+-- ORDER BY Total_Revenue DESC
+
+
+-- Q2 =>  part-2 =>  what are the top 5 products they are buying frequently?
+
+-- WITH base_data AS (
+--     SELECT 
+--         *
+--     FROM cleaned_sales
+-- ),
+
+-- customer_revenue AS (
+--     SELECT 
+--         CustomerID,
+--         SUM(Revenue) AS Total_Revenue
+--     FROM base_data
+--     GROUP BY CustomerID
+-- ),
+
+-- ranked_customers AS (
+--     SELECT 
+--         CustomerID,
+--         NTILE(5) OVER (ORDER BY Total_Revenue DESC) AS revenue_group
+--     FROM customer_revenue
+-- ),
+
+-- top_customers AS (
+--     SELECT CustomerID
+--     FROM ranked_customers
+--     WHERE revenue_group = 1
+-- )
+
+-- SELECT TOP 5
+--     b.StockCode,
+--     b.Description,
+--     SUM(b.Quantity) AS Total_Quantity_Purchased
+-- FROM base_data b
+-- JOIN top_customers t
+--     ON b.CustomerID = t.CustomerID
+-- GROUP BY b.StockCode, b.Description
+-- ORDER BY Total_Quantity_Purchased DESC
+
+-- SELECT TOP 5
+--     StockCode,
+--     [Description],
+--     SUM(Quantity) AS Total_Quantity_Purchased
+-- FROM base_data
+-- GROUP BY StockCode, [Description]
+-- ORDER BY Total_Quantity_Purchased DESC
+
+
+
+
+
+
+
+-- WITH customer_revenue AS (
+--     SELECT 
+--         CustomerID,
+--         SUM(Revenue) AS Total_Revenue
+--     FROM cleaned_sales
+--     GROUP BY CustomerID
+-- ),
+
+-- ranked AS (
+--     SELECT *,
+--            NTILE(5) OVER (ORDER BY Total_Revenue DESC) AS grp
+--     FROM customer_revenue
+-- )
+
+-- SELECT 
+--     SUM(CASE WHEN grp = 1 THEN Total_Revenue END) * 100.0 
+--         / SUM(Total_Revenue) AS Top20_Revenue_Percentage
+-- FROM ranked;
+
+
+
+
+
+
+-- Q3 =>  part-2 =>  what are the top 5 products they are buying frequently?
+
+
+
+SELECT 
+    Country,
+    SUM(Revenue) AS Revenue,
+    COUNT(DISTINCT CustomerID) AS UniqueCustomers
+FROM cleaned_sales
+GROUP BY Country
+ORDER BY Revenue DESC;
