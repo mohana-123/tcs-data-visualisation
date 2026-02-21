@@ -319,10 +319,10 @@
 -- ORDER BY AvgPrice ASC;
 
 
-SELECT
-    InvoiceMonth,
-    SUM(Revenue) AS Total_Revenue,
-    SUM(Quantity) AS Total_Quantity
-FROM retail_clean_with_nulls
-GROUP BY InvoiceMonth
-ORDER BY InvoiceMonth ASC;
+-- SELECT
+--     InvoiceMonth,
+--     SUM(Revenue) AS Total_Revenue,
+--     SUM(Quantity) AS Total_Quantity
+-- FROM retail_clean_with_nulls
+-- GROUP BY InvoiceMonth
+-- ORDER BY InvoiceMonth ASC;
