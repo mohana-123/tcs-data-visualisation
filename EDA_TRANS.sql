@@ -227,14 +227,102 @@
 
 
 
--- Q3 =>  part-2 =>  what are the top 5 products they are buying frequently?
+-- Q3 =>  what are the top 5 products they are buying frequently?
 
 
 
-SELECT 
-    Country,
-    SUM(Revenue) AS Revenue,
-    COUNT(DISTINCT CustomerID) AS UniqueCustomers
-FROM cleaned_sales
-GROUP BY Country
-ORDER BY Revenue DESC;
+-- SELECT
+--     Country,
+--     SUM(Revenue) AS Total_Revenue
+-- FROM cleaned_sales
+-- GROUP BY Country
+-- ORDER BY Total_Revenue DESC
+
+
+-- Top Region by Order Volume
+
+-- SELECT 
+--     Country,
+--     COUNT(DISTINCT InvoiceNo) AS Total_Orders
+-- FROM cleaned_sales
+-- GROUP BY Country
+-- ORDER BY Total_Orders DESC;
+
+
+
+-- Top Region by Customer Base
+
+-- SELECT 
+--     Country,
+--     COUNT(DISTINCT CustomerID) AS Unique_Customers
+-- FROM cleaned_sales
+-- GROUP BY Country
+-- ORDER BY Unique_Customers DESC;
+
+
+
+-- Combine All Metrics (Best Practice for Executive View)
+
+-- SELECT 
+--     Country,
+--     SUM(Revenue) AS Total_Revenue,
+--     COUNT(DISTINCT InvoiceNo) AS Total_Orders,
+--     COUNT(DISTINCT CustomerID) AS Unique_Customers
+-- FROM cleaned_sales
+-- GROUP BY Country
+-- ORDER BY Total_Revenue DESC;
+
+
+-- SELECT 
+--     Country,
+--     SUM(Revenue) AS Total_Revenue,
+--     ROUND(
+--         SUM(Revenue) * 100.0 / 
+--         SUM(SUM(Revenue)) OVER(), 
+--         2
+--     ) AS Revenue_Percentage
+-- FROM cleaned_sales
+-- GROUP BY Country
+-- ORDER BY Total_Revenue DESC;
+
+
+
+
+
+
+
+
+
+
+-- Q4 => are there are any conditions that affecting the sales despite of effective promotions of some low monetary products during some timelines?
+
+
+-- Monthly sales trend
+-- SELECT 
+--     YEAR(InvoiceDate) AS Year,
+--     MONTH(InvoiceDate) AS Month,
+--     SUM(Quantity * UnitPrice) AS Revenue
+-- FROM cleaned_sales
+-- GROUP BY YEAR(InvoiceDate), MONTH(InvoiceDate)
+-- ORDER BY Year, Month;
+
+
+-- Low price product revenue
+
+-- SELECT 
+--     [Description],
+--     UnitPrice,
+--     ROUND(AVG(UnitPrice), 3) AS AvgPrice,
+--     ROUND(SUM(Revenue), 3) AS Total_Revenue
+-- FROM cleaned_sales
+-- GROUP BY [Description]
+-- ORDER BY AvgPrice ASC;
+
+
+SELECT
+    InvoiceMonth,
+    SUM(Revenue) AS Total_Revenue,
+    SUM(Quantity) AS Total_Quantity
+FROM retail_clean_with_nulls
+GROUP BY InvoiceMonth
+ORDER BY InvoiceMonth ASC;
