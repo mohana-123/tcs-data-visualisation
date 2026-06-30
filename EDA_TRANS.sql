@@ -326,3 +326,60 @@
 -- FROM retail_clean_with_nulls
 -- GROUP BY InvoiceMonth
 -- ORDER BY InvoiceMonth ASC;
+
+
+
+-- Define customer type clearly ====================================================================================================
+-- to know which customers are repeat
+
+-- SELECT 
+--     CustomerID,
+--     CASE 
+--         WHEN COUNT(DISTINCT InvoiceNo) = 1 THEN 'One-time' 
+--         ELSE 'Repeat' 
+--     END AS repeat_ot_one_time 
+-- FROM retail_clean_with_out_nulls 
+-- GROUP BY CustomerID
+
+
+
+-- Create customer classification table ============================================================================================================
+
+-- WITH customer_orders AS (
+--     SELECT 
+--         CustomerID,
+--         COUNT(DISTINCT InvoiceNo) AS total_orders
+--     FROM retail_clean_with_out_nulls
+--     GROUP BY CustomerID
+-- )
+
+-- SELECT *
+-- FROM customer_orders
+-- ORDER BY total_orders DESC, CustomerID DESC;
+
+
+
+
+
+
+
+-- Calculate revenue by customer type ============================================================================================================
+
+
+WITH customer_summary AS (
+    SELECT
+        CustomerID,
+        CASE 
+            WHEN COUNT(DISTINCT InvoiceNo) = 1 THEN 'One-time'
+            ELSE 'Repeat'
+        END AS customer_type,
+        SUM(Quantity * UnitPrice) AS customer_revenue
+    FROM retail_clean_with_out_nulls
+    GROUP BY CustomerID
+)
+SELECT
+    customer_type,
+    ROUND(SUM(customer_revenue), 2) AS revenue
+FROM customer_summary
+GROUP BY customer_type
+ORDER BY revenue DESC;

@@ -1,0 +1,249 @@
+=================================================================================================================================================================================================
+
+
+
+Data Visualisation: Framing the Business Problem
+
+The focus was on structuring business-driven analytical questions aligned with leadership goals.
+
+The scenario required viewing revenue performance from both strategic (CEO) and customer/marketing (CMO) perspectives.
+
+CEO-focused analysis themes:
+
+1. In which region are your products are generating more revenue?
+2. Do you observe any seasonal trends for your products?
+3. Are our revenue dependent on the top customers or else they diversified?
+4. which months generate the lowest revenue? and why? 
+
+CMO-focused analysis themes:
+
+1. what is the average duration taking for a customer to buy again any of the product?
+2. Who are the top 20% customers revenue and what are the top 5 products they are buying frequently?
+3. what is a top region that customers buying your any of your products?
+4. are there are any conditions that affecting the sales despite of effective promotions of some low monetary products during some timelines?
+
+This exercise reinforced the importance of problem framing, stakeholder alignment, and metric selection.
+
+Part-1 of learning Data Analytics with a business-first mindset.
+
+
+
+
+
+=================================================================================================================================================================================================
+
+
+
+
+
+Today I deep-dived into two important data visualization concepts: Grammar of Graphics and choosing the right chart for the right question.
+One key learning: visualization is not about picking random charts -- it’s about mapping data systematically.
+Grammar of Graphics helped me understand that every chart is built from components:
+Data -> Aesthetics -> Geometry -> Scales -> Facets.
+It made me realize that good visuals are designed, not just created.
+The second concept reinforced something even more practical:
+Always choose a chart based on the business question.
+=> Comparing categories? -> Bar chart
+=> Trends over time? -> Line chart
+=> Distribution? -> Histogram
+=> Relationship? -> Scatter plot
+Clear question -> Correct visual -> Clear insight.
+
+It’s not about making them attractive - it’s about making them meaningful. 
+Still learning, still building.
+
+hashtag#DataAnalytics hashtag#DataVisualization hashtag#LearningJourney hashtag#PowerBI hashtag#Analytics
+hashtag#TCSdatavisualisation
+
+
+
+
+
+
+
+=================================================================================================================================================================================================
+
+
+
+
+
+
+
+
+
+For this case study, I worked as a data consultant for an online retail company preparing insights for the CEO and CMO.
+Instead of jumping directly into dashboards, I started with structured SQL-based Exploratory Data Analysis (EDA). The goal was to ensure every analysis answered a real business question.
+Here’s how I approached it:
+First, I performed dataset validation.
+I checked record counts, unique customers, products, countries, and the overall time span of the data. Understanding the scale and coverage of the dataset ensured that any conclusions would be reliable.
+Next, I conducted data quality checks.
+I identified null customer IDs, negative quantities, zero pricing issues, and cancelled transactions. Cleaning these inconsistencies was critical before calculating revenue or customer metrics.
+Done exploring...
+Now in next post 
+After cleaning, I will engineered key analytical fields such as:
+=> Revenue (Quantity × Unit Price)
+=> Month and Year extraction from invoice date
+=> Customer-level and invoice-level aggregations
+please check my previous posts to know their priorities
+
+please check this link: 
+https://lnkd.in/gWK67vWn
+
+feel free to suggest me anything in the comment or you can comment in github too
+
+
+The biggest learning from this phase was this:
+Exploratory analysis is about structuring data to answer strategic business decisions.
+
+This structured SQL-first approach ensures that any dashboard or recommendation built later stands on strong analytical foundations.
+
+hashtag#DataAnalytics hashtag#SQL hashtag#BusinessIntelligence hashtag#DataCleaning hashtag#TCSVirtualInternship hashtag#LearningJourney hashtag#TCS
+
+
+
+
+
+
+
+
+
+=================================================================================================================================================================================================
+
+
+
+
+
+
+
+Yesterday I have done Exploratory Data Analysis Today I focused on building a strong analytical foundation before moving into insights and dashboards.
+Instead of jumping into trends, I structured the work in two phases:
+Part 1: Data Cleaning (SQL)
+ I validated and refined the raw dataset by:
+=> Removing duplicate records
+=> Excluding cancelled invoices
+=> Filtering out negative quantities and zero pricing
+=> Handling NULL Customer IDs
+=> Creating a clean working table for reliable analysis
+This step ensured that revenue and customer metrics would not be distorted by returns or invalid transactions.
+Part 2: Dataset Overview & Revenue Structuring
+After cleaning, I explored:
+=> Total transactions
+=> Unique customers
+=> Unique products
+=> Countries covered
+=> Time span of the dataset
+I also created a calculated revenue column (Quantity × Unit Price) to prepare for trend and profitability analysis.
+Key learning from today:
+Exploratory Data Analysis is not about running random queries.
+ It’s about validating data integrity first, then structuring it to answer business-level questions.
+Tomorrow, I’ll move into:
+=> Monthly revenue trends
+=> Regional performance
+=> Customer revenue concentration and more in the PowerBI
+
+hashtag#SQL hashtag#DataAnalytics hashtag#BusinessIntelligence hashtag#DataCleaning hashtag#LearningJourney hashtag#TCSdatavisualisation
+
+
+
+
+
+
+
+=================================================================================================================================================================================================
+
+
+
+
+
+
+
+
+Yesterday, I built the analytical foundation using SQL.
+Today, I moved from structured data to business insights in Power BI.
+After cleaning and preparing the dataset, I focused on answering leadership-level questions - the kind a CEO and CMO would actually care about.
+Part 3: Revenue & Trend Analysis (Power BI)
+I began with monthly revenue trends to understand seasonality and sales stability.
+=> Identified peak revenue months and low-performing months (November & December)
+=> Evaluated whether revenue patterns are consistent or volatile(yup, Consistent)
+=> Checked for Q4 uplift patterns (common in retail businesses)
+This helped assess whether growth is operationally sustainable or seasonal.
+Part 4: Regional Performance Analysis
+Next, I analyzed revenue contribution by country.
+=> Identified top-performing regions
+=> Measured revenue concentration by geography
+=> Evaluated whether revenue is diversified or dependent on a few markets
+This is critical for expansion planning. If revenue is heavily concentrated in one region, expansion strategy must be risk-aware.
+Part 5: Customer Revenue Concentration
+One of the most important strategic questions:
+Is the business dependent on a small group of high-value customers?
+I analyzed:
+=> Revenue distribution across customers
+=> Top 20% customer contribution
+=> Repeat purchase patterns
+=> Customer concentration risk
+This provides insight into retention strategy and long-term stability.
+Part 6: Customer Behavior Insights (Marketing View)
+From a CMO perspective, I explored:
+=> Frequently bought products by top customers
+=> Product-level revenue drivers
+=> Low-performing stokes despite promotions
+This helps align marketing spend with actual customer behavior rather than assumptions.
+Key Learning from Today:
+Dashboards are not just visuals.
+They are decision-support systems.
+Every visual must answer a specific business question:
+ • Where should we expand?
+ • What should we promote?
+ • Which customers should we retain aggressively?
+ • Where are we losing revenue?
+Tomorrow, I’ll refine this into a leadership-ready presentation structured separately for:
+CEO → Revenue, Risk, Expansion
+ CMO → Customer Behavior, Retention, Product Strategy
+Step by step, turning raw data into executive-level decisions.
+This may take long time, but i will do it :)
+hashtag#DataAnalytics hashtag#PowerBI hashtag#SQL hashtag#BusinessIntelligence hashtag#EDA hashtag#DataDriven hashtag#AspiringDataAnalyst
+
+
+
+
+
+
+=================================================================================================================================================================================================
+
+
+
+
+
+
+
+
+I felt so much challenge to do the task and I loved it 
+Here How I pushed my limits, and I leveraged AI too...
+
+If I were presenting to a CMO, these are the 4 questions I would expect:
+1. How long does it take customers to purchase again?
+ Using SQL window functions and DAX, I calculated the average repurchase cycle.
+ Result: Customers return every 44 days on average.
+ This directly informs remarketing timing and retention campaigns.
+so we must trigger the marketing campaign and notification after 30 days
+2. Are we dependent on a small group of customers?
+ I performed a Pareto analysis 
+ The cumulative revenue curve clearly shows revenue concentration - a small percentage of customers drive a large share of total revenue.
+ This highlights both loyalty strength and concentration risk. 
+3. Which region generates the most revenue?
+ From the country-level analysis
+ Netherlands and EIRE lead revenue contribution, followed by Germany and France.
+ This indicates where expansion focus or localized campaigns would be most effective. but the top 2 have a concentration risk the revenue must be diversified to more countries
+4. Are promotions and low-price products actually increasing revenue?
+ From the monthly trend, revenue and quantity rise sharply from September to November, peaking in November.
+ However, early-year dips suggest seasonality impacts sales more than pricing strategy alone.
+Key insight:
+ Customer behavior and geographic concentration matter more than raw sales volume.
+ Marketing strategy should focus on high-value customer retention and regional optimization.
+Tools Used:
+ SQL (CTEs, ranking, window functions)
+ Power BI (DAX, Pareto analysis(my new concept learned on the go), dynamic filtering, KPI modeling)
+
+check out my github link=> https://lnkd.in/gWK67vWn
+
+hashtag#DataAnalytics hashtag#PowerBI hashtag#SQL hashtag#MarketingAnalytics hashtag#BusinessIntelligence
