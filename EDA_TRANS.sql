@@ -365,21 +365,46 @@
 
 -- Calculate revenue by customer type ============================================================================================================
 
+-- wrong query
+-- WITH customer_summary AS (
+--     SELECT
+--         CustomerID,
+--         CASE 
+--             WHEN COUNT(DISTINCT InvoiceNo) = 1 THEN 'One-time'
+--             ELSE 'Repeat'
+--         END AS customer_type,
+--         SUM(Quantity * UnitPrice) AS customer_revenue
+--     FROM retail_clean_with_out_nulls
+--     GROUP BY CustomerID
+-- )
+-- SELECT
+--     customer_type,
+--     ROUND(SUM(customer_revenue), 2) AS revenue,
+--     ROUND((customer_revenue * 100.0 / SUM(customer_revenue OVER())),2) AS revenue_percentage
+-- FROM customer_summary
+-- GROUP BY customer_type
+-- ORDER BY revenue DESC;
 
-WITH customer_summary AS (
-    SELECT
-        CustomerID,
-        CASE 
-            WHEN COUNT(DISTINCT InvoiceNo) = 1 THEN 'One-time'
-            ELSE 'Repeat'
-        END AS customer_type,
-        SUM(Quantity * UnitPrice) AS customer_revenue
-    FROM retail_clean_with_out_nulls
-    GROUP BY CustomerID
-)
-SELECT
-    customer_type,
-    ROUND(SUM(customer_revenue), 2) AS revenue
-FROM customer_summary
-GROUP BY customer_type
-ORDER BY revenue DESC;
+
+
+-- WITH customer_summary AS (
+--     SELECT
+--         CustomerID,
+--         CASE 
+--             WHEN COUNT(DISTINCT InvoiceNo) = 1 THEN 'One-time'
+--             ELSE 'Repeat'
+--         END AS customer_type,
+--         SUM(Quantity * UnitPrice) AS customer_revenue
+--     FROM retail_clean_with_out_nulls
+--     GROUP BY CustomerID
+-- )
+-- SELECT
+--     customer_type,
+--     ROUND(SUM(customer_revenue), 2) AS revenue,
+--     ROUND(
+--         SUM(customer_revenue) * 100.0 / SUM(SUM(customer_revenue)) OVER(), 
+--         2
+--     ) AS revenue_percentage
+-- FROM customer_summary
+-- GROUP BY customer_type
+-- ORDER BY revenue DESC;
