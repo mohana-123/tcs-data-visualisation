@@ -69,6 +69,41 @@
 -- SELECT * FROM retail_clean_with_nulls -- 5,26,051 rows with nulls in customer_id column
 
 
+
+
+
+-- Identify purchase rows that are fully offset by a later matching cancellation
+-- WITH matched_cancels AS (
+--     SELECT
+--         p.InvoiceNo AS Purchase_InvoiceNo
+--     FROM Online_Retail p
+--     JOIN Online_Retail c
+--         ON p.CustomerID = c.CustomerID
+--         AND p.StockCode = c.StockCode
+--         AND p.UnitPrice = c.UnitPrice
+--         AND p.Quantity = -c.Quantity
+--         AND c.InvoiceNo LIKE 'C%'
+--         AND p.InvoiceNo NOT LIKE 'C%'
+--         AND c.InvoiceDate > p.InvoiceDate
+-- )
+-- SELECT
+--     DISTINCT *,
+--     Quantity * UnitPrice AS Revenue,
+--     MONTH(InvoiceDate) AS InvoiceMonth,
+--     YEAR(InvoiceDate) AS InvoiceYear
+-- INTO retail_clean_netted
+-- FROM Online_Retail
+-- WHERE InvoiceNo NOT LIKE 'C%'
+--   AND InvoiceNo NOT LIKE 'A%'
+--   AND Quantity >= 0
+--   AND UnitPrice >= 0
+--   AND CustomerID IS NOT NULL
+--   AND InvoiceNo NOT IN (SELECT Purchase_InvoiceNo FROM matched_cancels);
+
+
+
+
+
 -- ################################################################################################################################################################
 
 
@@ -104,7 +139,7 @@
 -- ==============================================================================================================
 
 
--- VIEWs
+-- VIEWs for CMO Q2
 
 -- CREATE VIEW vw_customer_repeat_gap AS
 -- WITH gap_calc AS (
@@ -131,3 +166,34 @@
 -- SELECT COUNT(DISTINCT CustomerID) AS Repeat_Customers FROM vw_customer_repeat_gap;
 
 
+-- Step 2 — SQL: summary stats (don't stop at the mean)
+
+-- SELECT
+--     AVG(Days_Between_Purchases * 1.0) AS Mean_Gap,
+--     (SELECT AVG(Days_Between_Purchases * 1.0)
+--      FROM (SELECT TOP 50 PERCENT Days_Between_Purchases
+--            FROM vw_customer_repeat_gap ORDER BY Days_Between_Purchases) t) AS Median_Approx,
+--     SUM(CASE WHEN Days_Between_Purchases <= 30 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS Pct_Within_30d
+-- FROM vw_customer_repeat_gap;
+
+
+
+
+-- ==============================================================================================================
+
+
+
+-- CMO Q2
+
+
+-- WITH customer_revenue AS (
+--     SELECT CustomerID, SUM(Revenue) AS Total_Revenue
+--     FROM retail_clean_netted
+--     GROUP BY CustomerID
+-- ),
+-- ranked AS (
+--     SELECT *,
+--         NTILE(5) OVER (ORDER BY Total_Revenue DESC) AS revenue_group
+--     FROM customer_revenue
+-- )
+-- SELECT * FROM ranked WHERE revenue_group = 1;

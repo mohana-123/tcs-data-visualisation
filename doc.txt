@@ -1,83 +1,35 @@
-Here is the background information on your task
-An online retail store has hired you as a consultant to review their data and provide insights that would be valuable to the CEO and CMO
-of the business. The business has been performing well and the management wants to analyse what the major contributing factors are to the 
-revenue so they can strategically plan for next year.
 
-The leadership is interested in viewing the metrics from both an operations and marketing perspective. Management also intends to expand
-the business and is interested in seeking guidance into areas that are performing well so they can keep a clear focus on what’s working. 
-They would also like to view different metrics based on the demographic information that is available in the data.
+## CEO
 
-A meeting with the CEO and CMO has been scheduled for next month and you need to draft the relevant analytics and insights that would help 
-evaluate the current business performance and suggest metrics that would enable them to make the decision on expansion.
+**1. Revenue concentration by market (demographic lens, explicit)**
+Old framing buried "demographic" inside a risk/reward pitch. Fixed: *"Revenue is ~84% concentrated in the UK — is that concentration a reflection of the demographic profile of our current customer base (repeat, established, high-frequency), and does that same profile exist in any other country at meaningful scale?"*
+This forces the demographic angle to the surface instead of leaving Country as an implicit variable inside a revenue question.
 
-Remember, thinking from the perspective of business leaders allows you to analyse the data more effectively and present better insights.
+**2. Product/SKU concentration — keep, add qualitative layer**
+Old version was pure "what % of revenue comes from top SKUs." Add: *"...and qualitatively, do the top-selling products share a common theme (price point, category, gift-vs-utility use) that explains why they outperform, or is the concentration arbitrary?"*
+Numbers tell you *what's* concentrated; this makes you explain *why*, which is the qualitative half the brief asked for.
 
-To prepare for your meeting, you need to draft questions that you think will be important and relevant to the CEO and CMO. This preparation 
-will be your guide as you develop your presentation.
+**3. Monthly trend / seasonality — keep as is.**
+No change needed; it's already appropriately hedged as hypothesis-only.
 
-For this task, you are only required to draft the questions. Make sure to think both quantitatively and qualitatively.
+**4. Customer concentration risk — reframe, don't just quantify**
+Weak spot in the original: it only asked "how exposed are we." Fixed: *"How dependent is revenue on the top N customers, and does that concentration reflect a few large accounts we should proactively deepen relationships with, or a structural weakness in customer acquisition?"*
+Same data, but forces a strategic interpretation (retain vs. diversify) instead of stopping at a scary percentage.
 
-You’ve been provided a dataset in the resources below to use as the basis for your exploration. Review this data, taking note of what 
-information has been provided, what insights you can garner, and what is relevant to both the CEO and CMO respectively.
+## CMO
 
-a set of four questions that you anticipate each business leader will asked and want to know the answers to.
+**1. Repeat vs. one-time revenue split — keep as is.**
+Solid, foundational, no change needed.
 
-Questions for CEO:
+**2. Reorder gap / re-engagement window — keep as is.**
+Already correctly framed as an operational marketing question.
 
-In which region are your products are generating more revenue?
-Do you observe any seasonal trends for your products?
-Are our revenue dependent on the top customers or else they diversified?
-which months generate the lowest revenue? and why? 
+**3. Product correlation with repeat buying — this one's genuinely weak, replace framing**
+Original implied causation risk even with a disclaimer bolted on. Reframe as explicitly exploratory: *"Which products are most commonly a customer's first purchase, and do customers who start with those products show different repeat behavior — a pattern worth testing, not assuming, as an acquisition/onboarding lever?"*
+This is honest about what correlation can and can't tell you, and it's the kind of "we don't fully know, here's what's worth investigating" framing execs actually respect more than false certainty.
 
-Questions for CMO:
+**4. Demographic/geographic expansion opportunity — sharpen the demographic framing**
+Fixed: *"Outside the UK, which countries show customer behavior (revenue-per-customer, repeat rate) comparable to our best UK segments — i.e., where does the demographic profile suggest marketing spend would replicate what's already working, rather than starting cold?"*
+Ties directly back to the brief's "areas that are performing well so they can keep a clear focus on what's working" line, which your original CMO Q4 didn't reference at all.
 
-what is the average duration taking for a customer to buy again any of the product?
-Who are the top 20% customers revenue and what are the top 5 products they are buying frequently?
-what is a top region that customers buying your any of your products?
-are there are any conditions that affecting the sales despite of effective promotions of some low monetary products during some timelines?
-
-
-
-
-Data Visualisation: Empowering Business with Effective Insights => day-1 Virtual TCS internship
-task-1 => framing the businss senario:
-questions that I think will be important to analyse what are the major contributing factors are to the revenue
-and relevant to the CEO and CMO so they can strategically plan for next year.
-
-The leadership is interested in viewing the metrics from both an operations and marketing perspective. Management also intends
-to expand the business and is interested in seeking guidance into areas that are performing well so they can keep a clear focus 
-on what’s working. They would also like to view different metrics based on the demographic information that is available in the data.
-
-Questions for CEO:
-
-1. In which region are your products are generating more revenue?
-2. Do you observe any seasonal trends for your products?
-3. Are our revenue dependent on the top customers or else they diversified?
-4. which months generate the lowest revenue? and why? 
-
-Questions for CMO:
-
-1. what is the average duration taking for a customer to buy again any of the product?
-2. Who are the top 20% customers revenue and what are the top 5 products they are buying frequently?
-3. what is a top region that customers buying your any of your products?
-4. are there are any conditions that affecting the sales despite of effective promotions of some low monetary products during some timelines?
-
-
-
-
-
-
-
-
-
-How You Present This to CMO
-
-Instead of saying:
-
-“Average repeat duration is 45 days.”
-
-Say:
-
-“On average, customers return within 45 days. However, 60% of repeat purchases occur within 30 days, indicating a strong short-term repurchase behavior. This suggests we should trigger remarketing campaigns around 25–30 days after purchase.”
-
-That is executive framing.
+**What this doesn't fix**: you still only have one demographic variable (Country) to work with in this dataset. If a grader expects segmentation by age/income/gender and this data doesn't have it, no amount of question-rewriting solves that — flag the data limitation in your presentation rather than let the questions imply richer segmentation than the data supports.
