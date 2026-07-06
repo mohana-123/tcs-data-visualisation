@@ -33,3 +33,16 @@ Fixed: *"Outside the UK, which countries show customer behavior (revenue-per-cus
 Ties directly back to the brief's "areas that are performing well so they can keep a clear focus on what's working" line, which your original CMO Q4 didn't reference at all.
 
 **What this doesn't fix**: you still only have one demographic variable (Country) to work with in this dataset. If a grader expects segmentation by age/income/gender and this data doesn't have it, no amount of question-rewriting solves that — flag the data limitation in your presentation rather than let the questions imply richer segmentation than the data supports.
+
+
+
+
+
+
+docs during the sql queries
+
+
+5 customers (298 transactions) excluded due to 'Unspecified'/'European Community' country labels; CustomerID 12743 accounts for 131 of these and was a high-frequency buyer — repeat-purchase metrics do not include this customer.
+
+
+

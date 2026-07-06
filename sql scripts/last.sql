@@ -203,17 +203,21 @@ SELECT DISTINCT Country FROM clean_sales ORDER BY Country;
 
 
 
--- #######################################################################################################################
+-- ######################################################################################################################################
+
+
+
 
 
 -- schema tables for powerBI
 
--- Dim_Customer: one row per customer, including Guest
+-- Dim_Customer: one row per customer, including Guest =========================================================================================
 WITH customer_country AS (
     SELECT CustomerID, Country,
            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY COUNT(*) DESC) AS rn
     FROM clean_sales
     WHERE CustomerID IS NOT NULL
+      AND Country NOT IN ('European Community', 'Unspecified')
     GROUP BY CustomerID, Country
 )
 SELECT CAST(CustomerID AS VARCHAR(10)) AS CustomerKey, Country
@@ -221,20 +225,60 @@ FROM customer_country
 WHERE rn = 1
 UNION ALL
 SELECT '-1', 'Unknown'   -- Guest placeholder, no country
-;
 
--- Dim_Product: one row per StockCode, most frequent Description wins
+
+
+
+-- query to know the orphaned_revenue and rows
+
+SELECT SUM(Revenue) AS orphaned_revenue, COUNT(*) AS orphaned_rows
+FROM clean_sales
+WHERE CustomerID IN (
+    SELECT CustomerID
+    FROM clean_sales
+    WHERE CustomerID IS NOT NULL
+    GROUP BY CustomerID
+    HAVING SUM(CASE WHEN Country NOT IN ('European Community','Unspecified') THEN 0 ELSE 1 END) = COUNT(*)
+);
+
+
+
+SELECT CustomerID, COUNT(*) AS txn_count
+FROM clean_sales
+WHERE CustomerID IN (14265, 12743, 12363, 16320, 15108)
+GROUP BY CustomerID
+ORDER BY txn_count DESC;
+
+
+
+SELECT Country, COUNT(*) AS txn_count
+FROM clean_sales
+WHERE CustomerID = 12743
+GROUP BY Country;
+
+
+
+
+
+
+
+
+
+-- Dim_Product: one row per StockCode, most frequent Description wins =========================================================================================
 WITH product_desc AS (
-    SELECT StockCode, Description,
-           ROW_NUMBER() OVER (PARTITION BY StockCode ORDER BY COUNT(*) DESC) AS rn
+    SELECT StockCode, Description, COUNT(*) AS freq
     FROM clean_sales
     GROUP BY StockCode, Description
 )
 SELECT StockCode, Description
-FROM product_desc
+FROM (
+    SELECT StockCode, Description,
+           ROW_NUMBER() OVER (PARTITION BY StockCode ORDER BY freq DESC, Description ASC) AS rn
+    FROM product_desc
+) x
 WHERE rn = 1;
 
--- Fact_Sales: grain = one row per invoice line
+-- Fact_Sales: grain = one row per invoice line =========================================================================================
 SELECT
     InvoiceNo,
     StockCode,
@@ -243,6 +287,37 @@ SELECT
     Quantity,
     UnitPrice,
     Revenue
-FROM clean_sales;
+FROM clean_sales
+WHERE CustomerID NOT IN (14265, 12743, 12363, 16320, 15108) ;
 
 
+
+
+-- by this query i can know there is wrong with description
+SELECT StockCode, COUNT(DISTINCT Description) AS desc_count
+FROM clean_sales
+GROUP BY StockCode
+HAVING COUNT(DISTINCT Description) > 1
+ORDER BY desc_count DESC;
+
+
+
+
+
+
+
+--  to check the ties in product descriptions
+WITH product_desc AS (
+    SELECT StockCode, Description, COUNT(*) AS freq
+    FROM clean_sales
+    GROUP BY StockCode, Description
+),
+ranked AS (
+    SELECT StockCode, Description, freq,
+           ROW_NUMBER() OVER (PARTITION BY StockCode ORDER BY freq DESC) AS rn,
+           COUNT(*) OVER (PARTITION BY StockCode, freq) AS tie_count
+    FROM product_desc
+)
+SELECT StockCode, Description, freq, tie_count
+FROM ranked
+WHERE rn = 1 AND tie_count > 1;
