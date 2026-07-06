@@ -173,3 +173,76 @@ SELECT
   (SELECT SUM(Revenue) FROM clean_sales) AS TotalRevenue_AllRows,
   (SELECT SUM(Revenue) FROM clean_sales_with_out_null_customerID) AS TotalRevenue_KnownCustomers,
   (SELECT SUM(Revenue) FROM clean_sales) - (SELECT SUM(Revenue) FROM clean_sales_with_out_null_customerID) AS RevenueGap;
+
+
+SELECT TOP (1000) [InvoiceNo]
+      ,[StockCode]
+      ,[Description]
+      ,[Quantity]
+      ,[InvoiceDate]
+      ,[UnitPrice]
+      ,[CustomerID]
+      ,[Country]
+      ,[Revenue]
+  FROM [tcs_db].[dbo].[clean_sales]
+
+
+-- InvoiceNo, StockCode, Description, Quantity, InvoiceDate, UnitPrice, CustomerID, Country, Revenue
+
+
+SELECT DISTINCT Country FROM clean_sales ORDER BY Country;
+
+
+
+
+
+
+
+
+
+
+
+
+-- #######################################################################################################################
+
+
+-- schema tables for powerBI
+
+-- Dim_Customer: one row per customer, including Guest
+WITH customer_country AS (
+    SELECT CustomerID, Country,
+           ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY COUNT(*) DESC) AS rn
+    FROM clean_sales
+    WHERE CustomerID IS NOT NULL
+    GROUP BY CustomerID, Country
+)
+SELECT CAST(CustomerID AS VARCHAR(10)) AS CustomerKey, Country
+FROM customer_country
+WHERE rn = 1
+UNION ALL
+SELECT '-1', 'Unknown'   -- Guest placeholder, no country
+;
+
+-- Dim_Product: one row per StockCode, most frequent Description wins
+WITH product_desc AS (
+    SELECT StockCode, Description,
+           ROW_NUMBER() OVER (PARTITION BY StockCode ORDER BY COUNT(*) DESC) AS rn
+    FROM clean_sales
+    GROUP BY StockCode, Description
+)
+SELECT StockCode, Description
+FROM product_desc
+WHERE rn = 1;
+
+-- Fact_Sales: grain = one row per invoice line
+SELECT
+    InvoiceNo,
+    StockCode,
+    CAST(COALESCE(CustomerID, -1) AS VARCHAR(10)) AS CustomerKey,
+    InvoiceDate,
+    Quantity,
+    UnitPrice,
+    Revenue
+FROM clean_sales;
+
+
