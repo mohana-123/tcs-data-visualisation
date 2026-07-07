@@ -49,7 +49,8 @@ ORDER BY Month;
 
 WITH cust_rev AS (
   SELECT CustomerID, SUM(Quantity*UnitPrice) AS Revenue
-  FROM clean_sales_with_out_null_customerID
+  FROM clean_sales_with_null_customerID
+  WHERE CustomerID IS NOT NULL
   GROUP BY CustomerID
 ),
 ranked AS (
@@ -73,7 +74,8 @@ SELECT * FROM ranked ORDER BY Revenue DESC;
 WITH cust_orders AS (
   SELECT CustomerID, COUNT(DISTINCT InvoiceNo) AS OrderCount,
          SUM(Quantity*UnitPrice) AS Revenue
-  FROM clean_sales_with_out_null_customerID
+  FROM clean_sales_with_null_customerID
+  WHERE CustomerID IS NOT NULL
   GROUP BY CustomerID
 )
 SELECT CASE WHEN OrderCount > 1 THEN 'Repeat' ELSE 'One-time' END AS CustomerType,
@@ -89,7 +91,8 @@ GROUP BY CASE WHEN OrderCount > 1 THEN 'Repeat' ELSE 'One-time' END;
 
 WITH order_dates AS (
   SELECT CustomerID, InvoiceNo, MIN(InvoiceDate) AS OrderDate
-  FROM clean_sales_with_out_null_customerID
+  FROM clean_sales_with_null_customerID
+  WHERE CustomerID IS NOT NULL
   GROUP BY CustomerID, InvoiceNo
 ),
 gaps AS (
@@ -110,12 +113,14 @@ WHERE GapDays IS NOT NULL;
 
 WITH first_invoice AS (
   SELECT CustomerID, MIN(InvoiceNo) AS FirstInvoice
-  FROM clean_sales_with_out_null_customerID
+  FROM clean_sales_with_null_customerID
+  WHERE CustomerID IS NOT NULL
   GROUP BY CustomerID
 ),
 cust_status AS (
   SELECT CustomerID, COUNT(DISTINCT InvoiceNo) AS OrderCount
-  FROM clean_sales_with_out_null_customerID
+  FROM clean_sales_with_null_customerID
+  WHERE CustomerID IS NOT NULL
   GROUP BY CustomerID
 )
 SELECT r.StockCode, r.Description,
@@ -123,7 +128,7 @@ SELECT r.StockCode, r.Description,
        SUM(CASE WHEN cs.OrderCount = 1 THEN 1 ELSE 0 END) AS StayedOneTime,
        SUM(CASE WHEN cs.OrderCount > 1 THEN 1 ELSE 0 END) * 1.0
          / NULLIF(COUNT(*), 0) AS RepeatConversionRate
-FROM clean_sales_with_out_null_customerID r
+FROM clean_sales_with_null_customerID r
 JOIN first_invoice f ON r.CustomerID = f.CustomerID AND r.InvoiceNo = f.FirstInvoice
 JOIN cust_status cs ON r.CustomerID = cs.CustomerID
 GROUP BY r.StockCode, r.Description
@@ -140,7 +145,7 @@ WITH cust_country AS (
   SELECT CustomerID, Country,
          COUNT(DISTINCT InvoiceNo) AS OrderCount,
          SUM(Quantity*UnitPrice) AS Revenue
-  FROM clean_sales_with_out_null_customerID
+  FROM clean_sales_with_null_customerID
   WHERE Country != 'United Kingdom'
   GROUP BY CustomerID, Country
 )
@@ -166,16 +171,16 @@ ORDER BY AvgRevPerCustomer DESC;
 SELECT SUM(Revenue) AS TotalRevenue_AllRows FROM clean_sales;
 
 
-SELECT SUM(Revenue) AS TotalRevenue_KnownCustomers FROM clean_sales_with_out_null_customerID;
+SELECT SUM(Revenue) AS TotalRevenue_KnownCustomers FROM clean_sales_with_null_customerID;
 
 
 SELECT 
   (SELECT SUM(Revenue) FROM clean_sales) AS TotalRevenue_AllRows,
-  (SELECT SUM(Revenue) FROM clean_sales_with_out_null_customerID) AS TotalRevenue_KnownCustomers,
-  (SELECT SUM(Revenue) FROM clean_sales) - (SELECT SUM(Revenue) FROM clean_sales_with_out_null_customerID) AS RevenueGap;
+  (SELECT SUM(Revenue) FROM clean_sales_with_null_customerID) AS TotalRevenue_KnownCustomers,
+  (SELECT SUM(Revenue) FROM clean_sales) - (SELECT SUM(Revenue) FROM clean_sales_with_null_customerID) AS RevenueGap;
 
 
-SELECT TOP (1000) [InvoiceNo]
+SELECT TOP (100) [InvoiceNo]
       ,[StockCode]
       ,[Description]
       ,[Quantity]
@@ -288,7 +293,9 @@ SELECT
     UnitPrice,
     Revenue
 FROM clean_sales
-WHERE CustomerID NOT IN (14265, 12743, 12363, 16320, 15108) ;
+WHERE (CustomerID IS NULL OR CustomerID NOT IN (14265, 12743, 12363, 16320, 15108))
+  AND Country NOT IN ('European Community', 'Unspecified');
+
 
 
 

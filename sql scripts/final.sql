@@ -14,15 +14,33 @@
 
 
 
--- WITH ranked AS (
---     SELECT *,
---            ROW_NUMBER() OVER (
---                PARTITION BY InvoiceNo, StockCode, Quantity, InvoiceDate, UnitPrice, CustomerID
---                ORDER BY (SELECT NULL)
---            ) AS rn
---     FROM online_retail
--- )
--- SELECT * FROM ranked WHERE rn <> 1;
+WITH ranked AS (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY InvoiceNo, StockCode, Quantity, InvoiceDate, UnitPrice, CustomerID
+               ORDER BY (SELECT NULL)
+           ) AS rn
+    FROM Online_Retail
+)
+SELECT * FROM ranked WHERE rn <> 1;
+
+
+WITH ranked AS (
+    SELECT
+        StockCode,
+        Description,
+        COUNT(*) AS freq,
+        ROW_NUMBER() OVER (
+            PARTITION BY StockCode
+            ORDER BY COUNT(*) DESC, Description ASC
+        ) AS rn
+    FROM clean_sales
+    GROUP BY StockCode, Description
+)
+SELECT StockCode, Description
+FROM ranked
+WHERE rn = 1;
+
 -- SELECT * INTO online_retail_dedup FROM ranked WHERE rn = 1;
 
 
