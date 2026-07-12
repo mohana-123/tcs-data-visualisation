@@ -47,10 +47,32 @@ WITH product_desc AS (
     GROUP BY StockCode, Description
 )
 SELECT StockCode, Description
-INTO Dim_Product
 FROM (
     SELECT StockCode, Description,
            ROW_NUMBER() OVER (PARTITION BY StockCode ORDER BY freq DESC, Description ASC) AS rn
     FROM product_desc
 ) x
 WHERE rn = 1;
+
+
+
+SELECT TOP 10 * FROM Fact_sales 
+WHERE InvoiceDate = (SELECT MAX(InvoiceDate) FROM Fact_sales)
+ORDER BY Quantity * UnitPrice DESC
+
+
+
+SELECT CAST(InvoiceDate AS DATE) AS SaleDate, SUM(Quantity * UnitPrice) AS DailyRevenue
+FROM Fact_sales
+GROUP BY CAST(InvoiceDate AS DATE)
+ORDER BY DailyRevenue DESC
+
+
+
+SELECT CustomerKey, COUNT(DISTINCT InvoiceNo) AS Orders, SUM(Quantity*UnitPrice) AS Revenue
+FROM Fact_sales WHERE CAST(InvoiceDate AS DATE) = '2011-12-09'
+GROUP BY CustomerKey ORDER BY Revenue DESC
+
+
+SELECT COUNT(DISTINCT InvoiceNo) AS TotalOrders, SUM(Quantity*UnitPrice) AS TotalRevenue
+FROM Fact_sales WHERE CustomerKey = 16446

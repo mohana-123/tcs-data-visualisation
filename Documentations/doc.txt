@@ -39,10 +39,19 @@ Ties directly back to the brief's "areas that are performing well so they can ke
 
 
 
+
+
+
+
+
+
+
+
 docs during the sql queries
 
 
-5 customers (298 transactions) excluded due to 'Unspecified'/'European Community' country labels; CustomerID 12743 accounts for 131 of these and was a high-frequency buyer — repeat-purchase metrics do not include this customer.
+1. 5 customers (298 transactions) excluded due to 'Unspecified'/'European Community' country labels; CustomerID 12743 accounts for 131 of these and was a high-frequency buyer — repeat-purchase metrics do not include this customer.
 
+2. Guest checkouts are ~14.74% of revenue but can't be tracked as individuals, so customer-behavior metrics exclude them and that's disclosed on the report.
 
-
+3. "December 2011 reflects partial data (through Dec 9); a single customer order (~£168K) accounts for the bulk of that period's revenue."
