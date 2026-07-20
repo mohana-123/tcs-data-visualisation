@@ -47,6 +47,42 @@ Ties directly back to the brief's "areas that are performing well so they can ke
 
 
 
+
+brfore building =>
+
+Recommended build order — easiest/foundational first, hardest last, so you're not blocked:
+
+CEO Q3 — Monthly revenue trend (pure Dim_Date + Total Revenue, no new logic)
+CEO Q2 — Top products/SKU concentration (Dim_Product + Total Revenue)
+CEO Q1 — UK vs non-UK concentration (Dim_Customer[Country] + Total Revenue)
+CEO Q4 — Top-N customer concentration (needs the -1 exclusion decision made first)
+CMO Q1 — Repeat vs one-time buyer revenue split (needs a new "Customer Order Count" measure)
+CMO Q4 — Revenue-per-customer by non-UK country (builds on Q1's repeat logic)
+CMO Q2 — Reorder gap / re-engagement window (needs date-diff logic per customer, more complex DAX)
+CMO Q3 — Product mix vs repeat behavior (hardest, do last, scope it deliberately)
+
+
+after building =>
+
+
+CEO tier (4):
+
+Q1: UK vs. non-UK revenue concentration (85.2% UK dominance)
+Q2: Top products/SKU distribution (catalog spread, not Pareto concentration)
+Q3: Monthly revenue trend (with Dec 2011 partial-order caveat)
+Q4: Top-N customer concentration (with CustomerKey 16446 bulk-buyer footnote)
+
+CMO tier (4):
+
+Q1: Repeat vs. one-time revenue split (93% repeat, 7% one-time)
+Q2: Reorder gap distribution (median 22 days, P75 52 days re-engagement threshold)
+Q3: Product mix by repeat dependency (95%+ repeat across all top-10 SKUs)
+Q4: International expansion strategy by retention profile (Netherlands/Ireland retention focus, Germany/France acquisition expansion)
+
+
+
+
+
 docs during the sql queries
 
 

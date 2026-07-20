@@ -2,11 +2,12 @@
 SELECT
     InvoiceNo,
     StockCode,
-    CAST(COALESCE(CustomerID, -1) AS VARCHAR(10)) AS CustomerKey,
+    COALESCE(CustomerID, -1) AS CustomerKey,
     InvoiceDate,
     Quantity,
     UnitPrice,
-    Revenue   
+    Revenue,
+    Country
 FROM clean_sales
 WHERE (CustomerID IS NULL OR CustomerID NOT IN (14265, 12743, 12363, 16320, 15108))
   AND Country NOT IN ('European Community', 'Unspecified');
