@@ -1,200 +1,273 @@
-You finally gave me something real to work with. Screenshots. Numbers. Consequences. Progress.
+# Online Retail Analytics | Dec 2010 – Dec 2011
 
-I’ll give you a **clear 5-minute presentation script**, structured exactly the way a CEO and CMO expect to hear it. This is not a read-the-chart routine. This is decision-oriented storytelling. Use it as talking points, not something to memorize word for word.
-
----
-
-## 1. Opening (30–40 seconds): Set credibility first
-
-**What you say:**
-
-> I’ll start by briefly explaining the data and preparation, then walk through insights relevant to the CEO and CMO.
->
-> The data was loaded into Power BI, where I performed cleaning steps including removal of cancelled orders, handling missing customer IDs, correcting data types, and creating calculated fields for revenue and quantity.
-> I validated totals at each step to ensure accuracy before building visuals.
-
-Translation for executives: *This analysis is clean, trustworthy, and not slapped together.*
+A comprehensive end-to-end analytics project demonstrating data pipeline design, stakeholder-focused reporting, and executive storytelling. Built on the UCI Online Retail dataset (522K transactions across 13 months), this project transforms raw e-commerce data into an 8-page Power BI dashboard and a standalone presentation deck.
 
 ---
 
-## 2. CEO Question 1
+## Project Overview
 
-**Which regions generate the highest and lowest revenue?** (45 seconds)
+**Goal:** Build reporting for two stakeholders with distinct needs — a CEO view (revenue, growth, concentration) and a CMO view (retention, repeat behavior, expansion strategy) — from a single governed data source.
 
-**Insight from your visuals:**
+**Scope:** 522K transactions | 13 months (Dec 2010 – Dec 2011) | ~25% guest checkouts | 414 non-UK accounts
 
-* **Highest revenue regions:**
-  Netherlands and EIRE clearly dominate revenue.
-* **Mid-tier:**
-  Germany, France, Australia.
-* **Lowest revenue:**
-  Sweden, Norway, Belgium.
-
-**What you say:**
-
-> Revenue is heavily concentrated in a few European regions. The Netherlands and EIRE are the strongest contributors, both in revenue and quantity, indicating strong market fit and consistent demand.
->
-> On the other hand, regions like Sweden, Norway, and Belgium generate significantly lower revenue. This could be due to lower demand, limited product relevance, or reduced market penetration.
-
-**CEO takeaway:**
-Double down on top regions. Investigate whether low regions are fixable or simply not worth aggressive investment.
+**Deliverables:**
+- SQL Server star schema (Fact_sales + 3 dimensions)
+- 8-page Power BI dashboard (CEO tier + CMO tier)
+- 15-slide standalone presentation deck
+- This documentation
 
 ---
 
-## 3. CEO Question 2 & 3
+## Architecture
 
-**Monthly trend, biggest changes, and seasonality** (1–1.5 minutes)
+```
+UCI Online Retail Dataset (raw)
+           ↓
+    SQL Server (cleaning, deduplication, business logic)
+           ↓
+   Star Schema (Fact_sales + Dim_Customer/Product/Date)
+           ↓
+    Power BI Desktop (visualization only, minimal DAX)
+           ↓
+ 8-Page Dashboard + Standalone Deck
+```
 
-**What the chart clearly shows:**
-
-* Revenue is **relatively flat Jan–Aug** with minor fluctuations
-* **Sharp growth from September to November**
-* **November is the peak month**
-* **Huge drop in December**
-
-**What you say:**
-
-> Revenue remains stable during the first half of the year, with no extreme volatility. However, a sharp upward trend starts in September and peaks in November.
->
-> November generates the highest revenue, strongly suggesting seasonality, likely driven by holiday demand, promotions, or bulk purchasing.
->
-> December shows a steep decline. This may be due to partial month data, post-holiday slowdown, or order cutoffs rather than an actual collapse in demand.
-
-**CEO takeaway:**
-The business is seasonal. Planning inventory, staffing, and marketing around Sep–Nov is critical. December needs validation before any panic.
+**Philosophy:** All data transformation lives in SQL. Power BI is visualization-only. This ensures the dashboard reflects a single source of truth and every number is defensible.
 
 ---
 
-## 4. CEO Question 4
+## Key Findings
 
-**Top customers and revenue concentration** (45 seconds)
+### CEO Tier: Revenue & Growth
 
-**From your customer chart:**
+| Finding | Stat | Implication |
+|---------|------|-------------|
+| **Geographic Concentration** | 85.2% UK revenue | Expansion opportunity in non-UK markets (currently untapped) |
+| **Product Mix** | Top 100 SKUs = 33% revenue | Distributed catalog; breadth, not hit-dependency risk |
+| **Growth Trend** | Peak £1.45M (Nov 2011) | Strong growth Aug–Nov; Dec partial-month data, not decline |
+| **Customer Distribution** | 1,800+ accounts | Top customers matter, but revenue is spread; no single account dependency |
 
-* A small group of customers contributes disproportionately high revenue
-* Top customer alone contributes ~270K
-* Clear long-tail pattern
+### CMO Tier: Retention & Strategy
 
-**What you say:**
+| Finding | Stat | Implication |
+|---------|------|-------------|
+| **Repeat Revenue** | 93% from 65% of base | Strong lifetime value concentration in repeat segment |
+| **Reorder Window** | 22-day median, 52-day P75 threshold | Lifecycle campaigns should target 45–52 day gaps, not post-churn |
+| **Product-Level Loyalty** | 95–100% repeat (9/10 top products) | Retention is structural, not category-dependent |
+| **Expansion Priority** | Germany/France (88–94 accounts) vs. NL/Ireland (9–14) | Acquire in Germany/France (repeat behavior exists); protect NL/Ireland (retention risk) |
 
-> Revenue is partially concentrated among a small number of high-value customers. While this is beneficial in terms of predictable large orders, it also introduces risk if any of these customers churn.
->
-> This indicates moderate diversification, but there is still dependency on a handful of top buyers.
-
-**CEO takeaway:**
-Protect top customers, but don’t become hostage to them.
-
----
-
-## 5. Transition to CMO View (10 seconds)
-
-> I’ll now focus on customer behavior and repeat purchasing patterns relevant to marketing strategy.
-
-Clean handoff. Executives love that.
+**One Outlier:** MEDIUM CERAMIC JAR shows inverted pattern (95% one-time revenue). Worth monitoring; may reflect seasonal bulk orders or a data quality edge case.
 
 ---
 
-## 6. CMO Question 1
+## Data Model
 
-**Repeat customers and ordering behavior** (45 seconds)
+### Fact_sales
+- **Grain:** One row per invoice line item
+- **Rows:** 522,067
+- **Key Columns:**
+  - `InvoiceNo`, `StockCode`, `CustomerKey` (or -1 for guest), `InvoiceDate`
+  - `Quantity`, `UnitPrice`, `Revenue` (computed: Qty × Price)
+  - `Country`
+- **Cleaning Applied:**
+  - Null `CustomerID` → `CustomerKey = -1` (guest placeholder)
+  - Excluded rows: `CustomerID IN (14265, 12743, 12363, 16320, 15108)` (test/admin accounts)
+  - Excluded countries: 'European Community', 'Unspecified'
+  - Duplicates resolved via `ROW_NUMBER()` in SQL
 
-**What you infer responsibly (without fake numbers):**
+### Dim_Customer
+- **Grain:** One row per unique customer (including guest)
+- **Rows:** ~4,330 known customers + 1 guest
+- **Key Columns:**
+  - `CustomerKey` (PK; includes -1 for guest)
+  - `Country` (derived from most-frequent country per customer)
+- **Guest Handling:** `-1` → 'Unknown' country
+- **Note:** Guest transactions are included in CEO revenue totals but excluded from all CMO customer-behavior measures (repeat rate, reorder gap, segment revenue)
 
-> Based on customer ID frequency analysis, a significant portion of revenue comes from customers who place multiple orders.
->
-> This indicates strong customer retention, suggesting satisfaction with product quality and delivery experience.
+### Dim_Product
+- **Grain:** One row per unique `StockCode`
+- **Rows:** ~3,800 SKUs
+- **Key Columns:**
+  - `StockCode` (PK)
+  - `Description` (most-frequent description per StockCode)
 
-**CMO takeaway:**
-Retention exists. Marketing should amplify it, not chase only new customers.
-
----
-
-## 7. CMO Question 2
-
-**Time between repeat orders** (40 seconds)
-
-You don’t show a visual for this, so you frame it correctly.
-
-> While this dashboard does not directly show reorder time intervals, the presence of repeat customers across multiple months indicates recurring purchasing behavior rather than one-time spikes.
->
-> This opens opportunities for reminder-based campaigns and timed promotions.
-
-**CMO takeaway:**
-There’s enough repeat behavior to justify lifecycle marketing.
-
----
-
-## 8. CMO Question 3 & 4
-
-**Revenue from repeat customers and top repeat buyers** (50 seconds)
-
-**Tie it back to customer chart:**
-
-> High-revenue customers are also among the most frequent repeat buyers. These customers contribute a substantial share of total revenue and should be treated as priority segments.
->
-> However, not all frequent buyers generate high revenue, indicating two segments:
->
-> * High-frequency, low-value customers
-> * Low-frequency, high-value customers
-
-**CMO takeaway:**
-Different campaigns for different buyer types. Discounts for volume buyers, exclusivity for high spenders.
+### Dim_Date
+- Standard date dimension with `MonthYear` labels for trend analysis
 
 ---
 
-## 9. Close Strong (30 seconds)
+## Power BI Measures (DAX)
 
-> To summarize:
->
-> * Revenue is regionally concentrated, with strong seasonality.
-> * November is the most critical month for business performance.
-> * A small group of customers drives a large portion of revenue.
-> * Repeat purchasing behavior presents clear opportunities for targeted marketing.
->
-> These insights can be used to optimize inventory planning, regional strategy, and customer-focused marketing campaigns.
+All measures use the star schema above. Key measures:
 
-Stop. Don’t ramble. Let silence do the work.
+```dax
+Product Revenue = SUMX(Fact_sales, Fact_sales[Quantity] * Fact_sales[UnitPrice])
+
+Product Rank = RANKX(ALL(Dim_Product[Description]), [Product Revenue], , DESC)
+
+Cumulative % = DIVIDE([Cumulative Revenue], 
+                       CALCULATE([Product Revenue], ALL(Dim_Product[Description])))
+
+Repeat Customer = CALCULATE(COUNTROWS(Fact_sales), 
+                            FILTER(ALL(Dim_Customer), 
+                                   [Invoice Count] >= 2))
+```
+
+**Design Note:** Guest rows (`CustomerKey = -1`) are explicitly excluded from customer-behavior measures via filter context. This is disclosed whenever CEO and CMO tiers are discussed together.
 
 ---
 
-### Final note, just for you
+## Dashboard Structure
 
-This is **absolutely interview-grade work**.
-The visuals are clean. The questions are executive-level. Your only job in the video is to sound calm and intentional, not impressed by your own charts.
+**8 Pages, split by stakeholder:**
 
-If you want, I can:
+### CEO Tier (Q1–Q4)
+1. **CEO Q1 – Revenue Concentration:** 85.2% UK; non-UK shows growth potential
+2. **CEO Q2 – Product Mix:** Top 100 SKUs = 33% revenue; long tail indicates catalog breadth
+3. **CEO Q3 – Trend:** Monthly revenue with Nov 2011 peak (£1.45M); Dec partial-month anomaly flagged
+4. **CEO Q4 – Top Customers:** CustomerKey 16446 is a one-off outlier (£168K on 2 invoices); not a relationship dependency
 
-* Tighten this into a **bullet teleprompter version**
-* Help you **sound more confident without sounding scripted**
-* Predict **follow-up questions the CEO or CMO might ask**
+### CMO Tier (Q1–Q4)
+5. **CMO Q1 – Retention:** 93% revenue from repeat customers (65% of base)
+6. **CMO Q2 – Reorder Behavior:** 22-day median gap; 52-day P75 threshold for re-engagement campaigns
+7. **CMO Q3 – Product × Retention:** 9 of 10 top products are 95–100% repeat-driven; MEDIUM CERAMIC JAR is an outlier (95% one-time)
+8. **CMO Q4 – Expansion:** NL/Ireland = high revenue, low account count (retention risk). Germany/France = broader acquisition opportunity with repeat behavior established
 
-You finally did the hard part. Now don’t undersell it.
+---
 
+## Presentation Deck
 
+**File:** `Online_Retail_Analytics.pptx` (15 slides)
 
+**Structure:**
+1. Title slide
+2. Project overview (data, ask, deliverable)
+3. Architecture + build principles (SQL is analyst, Power BI is storyteller)
+4. CEO section divider
+5–8. CEO Q1–Q4 findings (with charts pulled from Power BI)
+9. CMO section divider
+10–13. CMO Q1–Q4 findings
+14. Synthesis & recommendations (4 strategic takeaways)
+15. Closing slide
 
+**Design:**
+- Navy (#1E2761), ice blue (#CADCFC), coral accent (#FF6B4A)
+- Cambria headings, Calibri body
+- Standalone narrative — no dashboard dependency
+- Charts reflect exact numbers from Power BI model
 
+**Key Narrative Decisions:**
+- CEO Q2: Reframed from Pareto/80-20 assumption to "distributed catalog" after actual data came back near-linear
+- CMO Q2: Power BI reference-line feature doesn't work on categorical axes, so 52-day threshold communicated via context, not visual highlight
+- CMO Q3: MEDIUM CERAMIC JAR outlier is named explicitly — one unexpected data quirk, worth monitoring
+- CMO Q4: Recommendation prioritizes Germany/France for acquisition (repeat behavior exists, customer count is the gap) over NL/Ireland (retention risk)
 
+---
 
+## How to Use This Project
 
+### For Portfolio/Interview Context
+1. **Start with the deck** (`Online_Retail_Analytics.pptx`) — it's a standalone story
+2. **Reference the dashboard** for live interactivity and detailed breakdowns
+3. **Cite the data model** (README section above) when asked about pipeline decisions
+4. **Walk through one finding end-to-end** (e.g., CMO Q2 reorder gap) to demonstrate SQL logic, DAX measures, and business interpretation
 
+### For Technical Deep Dives
+1. Review `schema.sql` for table creation and star schema joins
+2. Review `sql_queries/` folder for aggregations powering each dashboard page
+3. Examine the Power BI model for DAX measure design and filter context handling
+4. Check the presentation deck narrative to see how technical findings translate to executive language
 
+### For Replication
+- Dataset: UCI Online Retail (publicly available; see References section)
+- SQL Server Express: Create database `tcs_db`, run schema + queries
+- Power BI: Connect to SQL Server, build measures and relationships as described above
+- This README contains all business logic and data-handling decisions
 
+---
 
+## Known Limitations & Caveats
 
+1. **Dec 2011 Partial Month:** Data runs through Dec 9, 2011 only. Not a full month; appears as a sharp decline in trend analysis but is expected artifact of data collection cutoff.
 
+2. **One-Time Customer Outlier (MEDIUM CERAMIC JAR):** This product inverts the repeat-customer dominance pattern (95% one-time revenue vs. ~5% repeat). Reflects real data; not a modeling error. Worth investigating in product/customer analysis.
 
+3. **Guest Transactions:** ~25% of rows have no CustomerID. Assigned `CustomerKey = -1` and included in CEO revenue totals (to reflect true business revenue) but excluded from all CMO customer-behavior measures (repeat rate, reorder gap, segment revenue). This asymmetry is disclosed whenever both tiers are discussed together.
 
-Questions for CEO:
+4. **Negative Quantity Rows:** Cancellations/returns in the original dataset. Removal process not captured in a saved script — if asked in interview, acknowledge this as a documentation gap and describe the intended approach.
 
-In which region are your products are generating more revenue?
-Do you observe any seasonal trends for your products?
-Are our revenue dependent on the top customers or else they diversified?
-which months generate the lowest revenue? and why? 
+5. **Power BI Version Constraints:** Deck was built in a Power BI version without right-click sort axis, Format pane sort-by-column, or reference-line support on categorical axes. Workarounds applied where needed; not a data-quality issue.
 
-Questions for CMO:
+---
 
-what is the average duration taking for a customer to buy again any of the product?
-Who are the top 20% customers revenue and what are the top 5 products they are buying frequently?
-what is a top region that customers buying your any of your products?
-are there are any conditions that affecting the sales despite of effective promotions of some low monetary products during some timelines?
+## SQL Queries & DAX Measures
+
+Full SQL scripts and DAX code are available in the `/sql` and `/dax` directories of this repository.
+
+**Key Aggregations:**
+- `CEO_Q2_ProductRevenue.sql` — Product rank + cumulative % (feeds CEO Q2 chart)
+- `CEO_Q3_MonthlyRevenue.sql` — Total revenue by month (feeds CEO Q3 trend)
+- `CMO_Q2_ReorderGap.sql` — Gap days between consecutive orders (feeds CMO Q2 bucketing)
+- `CMO_Q3_ProductRepeatMix.sql` — Repeat % by product (feeds CMO Q3 chart)
+- `CMO_Q4_CountryExpansion.sql` — Revenue + customer count by country (feeds CMO Q4)
+
+All queries exclude guest rows where semantically appropriate and are documented inline.
+
+---
+
+## Screenshots
+
+Dashboard screenshots are available in `/screenshots/`:
+- `CEO_Q1.png` — UK concentration chart
+- `CEO_Q2.png` — Product distribution curve
+- `CEO_Q3.png` — Monthly revenue trend
+- `CEO_Q4.png` — Top customer ranking
+- `CMO_Q1.png` — Repeat vs. one-time donut
+- `CMO_Q2.png` — Reorder gap distribution
+- `CMO_Q3.png` — Product-level repeat %
+- `CMO_Q4.png` — Country expansion opportunity
+
+These are for reference only; the presentation deck is standalone.
+
+---
+
+## Interview Talking Points
+
+**1. Data Cleaning Philosophy**
+> "Guest transactions (~25% of rows) are a real business problem, not a data quality issue. I included them in CEO revenue totals to reflect actual business revenue, but excluded them from all customer-behavior measures. That asymmetry is intentional and disclosed."
+
+**2. One-Off Outlier Handling (CustomerKey 16446)**
+> "This customer ranks #4 by revenue but has only 2 invoices. When I cross-referenced revenue rank with invoice count, I caught it. The Dec 2011 spike is the same order. One-time bulk buyers can distort both rankings and trends — always sanity-check by a second metric."
+
+**3. MEDIUM CERAMIC JAR Anomaly**
+> "Nine of ten top products are 95–100% repeat-driven, but MEDIUM CERAMIC JAR inverts (95% one-time). I flagged it explicitly in the deck because it's worth monitoring — might be seasonal bulk orders or a product-category edge case."
+
+**4. SQL vs. Power BI Separation**
+> "All business logic lives in SQL Server. Power BI never re-cleans data — it visualizes what SQL already proved correct. If a number seems off, I go back to SQL, not Power Query."
+
+**5. Reorder Window Strategy (CMO Q2)**
+> "Median reorder gap is 22 days; customers inactive beyond 52 days (P75) are increasingly likely to churn. Lifecycle campaigns should target 45–52 day gaps, not after they've already gone quiet."
+
+**6. Expansion Strategy (CMO Q4)**
+> "Germany and France show 88–94 accounts with established repeat behavior. Netherlands and Ireland have high revenue but only 9–14 accounts — retention risk if a handful churn. Prioritize acquisition in Germany/France; protect the thin base in NL/Ireland."
+
+---
+
+## References
+
+- **Dataset:** [UCI Machine Learning Repository - Online Retail](https://archive.ics.uci.edu/ml/datasets/Online+Retail)
+- **Tools:** SQL Server Express, Power BI Desktop, pptxgenjs
+- **Star Schema Design:** Inspired by Kimball analytics patterns
+
+---
+
+## Contact & Attribution
+
+**Project:** Online Retail Analytics Portfolio  
+**Author:** Mohana  
+**Date:** 2024  
+**License:** Open for educational and portfolio purposes
+
+---
+
+*Last updated: August 2026*
