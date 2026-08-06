@@ -135,6 +135,42 @@ Repeat Customer = CALCULATE(COUNTROWS(Fact_sales),
 
 ---
 
+
+## Screenshots
+
+<img width="1323" height="739" alt="overview" src="https://github.com/user-attachments/assets/7ecb9784-8272-469d-ad1e-9646ee465ce3" />
+
+<img width="1323" height="743" alt="CEO_Q1" src="https://github.com/user-attachments/assets/5e6795b5-6ac1-40a4-b690-1d215e658570" />
+
+
+<img width="1324" height="744" alt="CEO_Q2" src="https://github.com/user-attachments/assets/58cdbadb-9347-4710-a05a-02346e8bd757" />
+
+
+<img width="1322" height="744" alt="CEO_Q3" src="https://github.com/user-attachments/assets/59fb0aee-40db-43da-a0dc-b0652dbc5890" />
+
+
+<img width="1323" height="745" alt="CEO_Q4" src="https://github.com/user-attachments/assets/2bbffd28-e9a4-4457-a78d-b10c56131a7a" />
+
+
+<img width="1322" height="745" alt="CMO_Q1" src="https://github.com/user-attachments/assets/e49be0bb-e18c-4437-b312-4905dd25bf60" />
+
+
+<img width="1323" height="747" alt="CMO_Q2" src="https://github.com/user-attachments/assets/bf21c3a1-ff6a-4d1e-bd89-9499f00a22c1" />
+
+<img width="1324" height="745" alt="CMO_Q3" src="https://github.com/user-attachments/assets/2c8b28ff-8d3d-43b3-a227-2aa773cbc6b3" />
+
+
+<img width="1323" height="743" alt="CMO_Q4" src="https://github.com/user-attachments/assets/3726aa33-123a-4264-98a0-39cfb73cbf02" />
+
+
+
+
+
+
+
+
+
+
 ## Presentation Deck
 
 **File:** `Online_Retail_Analytics.pptx` (15 slides)
